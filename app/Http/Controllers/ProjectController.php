@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,7 +43,19 @@ class ProjectController extends Controller
     // Muestra el detalle de un proyecto
     public function show(Project $project)
     {
-        return view('projects.show', ['project' => $project]);
+        // Ids de los usuarios que ya están en el proyecto
+        $idsParticipantes = $project->participants->pluck('id');
+
+        // Usuarios que se pueden añadir: ni el propietario ni los que ya participan
+        $usuariosDisponibles = User::where('id', '!=', $project->user_id)
+            ->whereNotIn('id', $idsParticipantes)
+            ->orderBy('name')
+            ->get();
+
+        return view('projects.show', [
+            'project' => $project,
+            'usuariosDisponibles' => $usuariosDisponibles,
+        ]);
     }
 
     // Muestra el formulario para editar un proyecto
