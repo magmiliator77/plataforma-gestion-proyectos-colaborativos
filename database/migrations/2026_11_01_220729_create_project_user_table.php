@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('role');
             $table->integer('contribution_hours')->default(0);
             $table->timestamps();
+
+            // Un mismo usuario no puede estar dos veces en el mismo proyecto
+            $table->unique(['project_id', 'user_id']);
         });
     }
 
