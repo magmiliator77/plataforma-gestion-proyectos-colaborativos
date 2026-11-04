@@ -12,7 +12,9 @@ class ProjectController extends Controller
     // Lista todos los proyectos
     public function index()
     {
-        $projects = Project::all();
+        // with() trae el propietario y los participantes en pocas consultas,
+        // en vez de hacer una consulta por cada proyecto de la lista
+        $projects = Project::with('owner', 'participants')->orderBy('deadline')->get();
 
         return view('projects.index', ['projects' => $projects]);
     }
@@ -35,9 +37,9 @@ class ProjectController extends Controller
         // El propietario es siempre el usuario que ha iniciado sesión
         $datos['user_id'] = Auth::id();
 
-        Project::create($datos);
+        $project = Project::create($datos);
 
-        return redirect()->route('projects.index');
+        return redirect()->route('projects.show', $project)->with('mensaje', 'Proyecto creado.');
     }
 
     // Muestra el detalle de un proyecto
@@ -74,7 +76,7 @@ class ProjectController extends Controller
         $datos = $request->validate($this->reglas());
         $project->update($datos);
 
-        return redirect()->route('projects.show', $project);
+        return redirect()->route('projects.show', $project)->with('mensaje', 'Cambios guardados.');
     }
 
     // Borra un proyecto
@@ -84,7 +86,7 @@ class ProjectController extends Controller
 
         $project->delete();
 
-        return redirect()->route('projects.index');
+        return redirect()->route('projects.index')->with('mensaje', 'Proyecto borrado.');
     }
 
     // Reglas de validación, iguales al crear y al editar

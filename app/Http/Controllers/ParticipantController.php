@@ -36,7 +36,7 @@ class ParticipantController extends Controller
             'contribution_hours' => $datos['contribution_hours'],
         ]);
 
-        return redirect()->route('projects.show', $project);
+        return redirect()->route('projects.show', $project)->with('mensaje', 'Participante añadido.');
     }
 
     // Cambia el rol y las horas de un participante
@@ -55,7 +55,7 @@ class ParticipantController extends Controller
             'contribution_hours' => $datos['contribution_hours'],
         ]);
 
-        return redirect()->route('projects.show', $project);
+        return redirect()->route('projects.show', $project)->with('mensaje', 'Participante actualizado.');
     }
 
     // Quita a un usuario del proyecto
@@ -67,7 +67,7 @@ class ParticipantController extends Controller
         // pero el usuario sigue existiendo en la tabla users
         $project->participants()->detach($user->id);
 
-        return redirect()->route('projects.show', $project);
+        return redirect()->route('projects.show', $project)->with('mensaje', 'Participante quitado del proyecto.');
     }
 
     // Igual que en ProjectController: solo el propietario puede gestionar participantes

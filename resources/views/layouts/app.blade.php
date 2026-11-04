@@ -15,7 +15,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-stone-50">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -29,6 +29,15 @@
 
             <!-- Page Content -->
             <main>
+                {{-- Mensaje que manda el controlador con ->with('mensaje', ...) después de guardar --}}
+                @if (session('mensaje'))
+                    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                        <p class="rounded-md border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
+                            {{ session('mensaje') }}
+                        </p>
+                    </div>
+                @endif
+
                 {{ $slot }}
             </main>
         </div>

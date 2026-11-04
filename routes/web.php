@@ -9,8 +9,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Después de iniciar sesión Breeze manda aquí; yo prefiero ir directamente a los proyectos
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect()->route('projects.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
