@@ -43,8 +43,8 @@
         ['x' => 1, 'y' => 0, 'z' => -1, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 34, 'fin' => 39],
 
         // Barra unida: los dos bloques tumbados juntos
-        // 'tapaJunta' => true tapa la raya que queda entre la barra y la columna, para que se vean unidas
-        ['x' => 1, 'y' => 0, 'z' => -0.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'aparece', 'inicio' => 39, 'fin' => 100, 'tapaJunta' => true],
+        // 'caraEnL' => true dibuja la cara de delante de la columna y la barra como una sola L, para que se vean unidas
+        ['x' => 1, 'y' => 0, 'z' => -0.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'aparece', 'inicio' => 39, 'fin' => 100, 'caraEnL' => true],
 
         // 3. Bloque gris de apoyo, en el suelo, a continuación de la barra
         ['x' => 1, 'y' => 0, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'apoyo', 'inicio' => 42, 'fin' => 100],
@@ -106,10 +106,24 @@
                     <div class="cara" style="width: {{ $cara['ancho'] }}px; height: {{ $cara['alto'] }}px; left: -{{ $cara['ancho'] / 2 }}px; top: -{{ $cara['alto'] / 2 }}px; transform: {{ $cara['giro'] }};"></div>
                 @endforeach
 
-                {{-- Parche blanco sin borde encima de la raya donde la barra toca la columna.
-                     Va dentro de la pieza, así se mueve con ella. isset() mira si la pieza tiene esa clave. --}}
-                @if (isset($pieza['tapaJunta']))
-                    <div class="tapa-junta" style="width: 7px; height: {{ $alto - 6 }}px; left: -{{ $ancho / 2 + 3 }}px; top: -{{ $alto / 2 - 3 }}px; transform: translateZ({{ $fondo / 2 + 0.5 }}px);"></div>
+                {{-- Cara delantera en forma de L: la columna y la barra dibujadas como UNA sola cara,
+                     así no queda ninguna raya entre ellas. Es un polígono SVG con 6 esquinas.
+                     Va dentro de la barra, así se mueve con ella. isset() mira si la pieza tiene esa clave. --}}
+                @if (isset($pieza['caraEnL']))
+                    @php
+                        // t = un bloque; b = medio borde (el borde mide 3px)
+                        $t = $tam;
+                        $b = 1.5;
+                        $puntos = $b . ',' . $b . ' '
+                            . ($t - $b) . ',' . $b . ' '
+                            . ($t - $b) . ',' . (2 * $t + $b) . ' '
+                            . (2 * $t - $b) . ',' . (2 * $t + $b) . ' '
+                            . (2 * $t - $b) . ',' . (3 * $t - $b) . ' '
+                            . $b . ',' . (3 * $t - $b);
+                    @endphp
+                    <svg class="cara-en-l" width="{{ 2 * $t }}" height="{{ 3 * $t }}" style="left: -{{ 1.5 * $t }}px; top: -{{ 2.5 * $t }}px; transform: translateZ({{ $fondo / 2 + 1 }}px);">
+                        <polygon points="{{ $puntos }}" fill="#ffffff" stroke="#ff2d20" stroke-width="3" stroke-linejoin="miter" />
+                    </svg>
                 @endif
             </div>
         @endforeach
@@ -150,18 +164,26 @@
         position: absolute;
         background: #ffffff;
         border: 3px solid #ff2d20;
+        /* outline dibuja 1px de rojo por fuera del borde: tapa la rendija que deja
+           el navegador entre dos caras que se tocan */
+        outline: 1px solid #ff2d20;
+        /* Las caras que miran hacia atrás no se dibujan. Si se dibujaran, se cuelan
+           por las aristas y se ve una raya blanca en medio de las líneas rojas. */
+        backface-visibility: hidden;
     }
 
-    /* Parche blanco que tapa la raya entre la columna y la barra */
-    .tapa-junta {
+    /* La cara en L que une la columna y la barra */
+    .cara-en-l {
         position: absolute;
-        background: #ffffff;
+        overflow: visible;
+        backface-visibility: hidden;
     }
 
     /* El apoyo es gris para que se vea que no forma parte del logo */
     .apoyo .cara {
         background: #e7e5e4;
         border-color: #a8a29e;
+        outline-color: #a8a29e;
     }
 
     /* La figura gira 90 grados cada dos bloques, para que se vea dónde encaja el siguiente.
