@@ -20,6 +20,15 @@
 @section('content')
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
 
+        {{-- Errores de los formularios de participantes, todos juntos arriba (como en los apuntes) --}}
+        @if ($errors->any())
+            <div class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                @foreach ($errors->all() as $error)
+                    {{ $error }}<br>
+                @endforeach
+            </div>
+        @endif
+
         {{-- Datos del proyecto --}}
         <section>
             <dl class="grid gap-4 sm:grid-cols-3">
@@ -109,12 +118,6 @@
                     </tbody>
                 </table>
             </div>
-            @error('role')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-            @error('contribution_hours')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-            @enderror
         </section>
 
         {{-- Solo el propietario puede añadir participantes, editar y borrar el proyecto --}}
@@ -136,9 +139,6 @@
                                         <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
                                     @endforeach
                                 </select>
-                                @error('user_id')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <div>
