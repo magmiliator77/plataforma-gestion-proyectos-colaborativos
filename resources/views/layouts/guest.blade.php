@@ -16,7 +16,7 @@
     </head>
     <body class="font-sans text-stone-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-stone-50">
-            {{-- Logo animado del cubo (resources/views/partials/logo-cubo.blade.php) --}}
+            {{-- Logo de Laravel animado con bloques (resources/views/partials/logo-cubo.blade.php) --}}
             <a href="/" class="flex flex-col items-center">
                 @include('partials.logo-cubo')
                 <span class="mt-2 text-lg font-bold text-stone-900">{{ config('app.name') }}</span>
