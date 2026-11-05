@@ -19,7 +19,7 @@
 
             /* El logo animado del login, pero más grande en la portada */
             .logo-grande {
-                transform: scale(1.5);
+                transform: scale(1.15);
             }
         </style>
     </head>
@@ -73,7 +73,7 @@
                         </div>
                     </div>
 
-                    <div class="relative -mt-6 rounded-xl border border-stone-200 bg-white p-6">
+                    <div class="relative mt-2 rounded-xl border border-stone-200 bg-white p-6">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <p class="text-sm text-stone-500">Propietaria: Ana</p>

@@ -7,13 +7,18 @@
      Todo es HTML y CSS: las piezas las creo con @foreach y las animaciones con @keyframes. --}}
 @php
     // Tamaño de un bloque en píxeles
-    $tam = 24;
+    $tam = 25;
 
     // Duración de toda la animación en segundos
-    $duracion = 11;
+    $duracion = 13;
 
     // Ángulo final en el que la figura se ve como el logo de Laravel
     $giroFinal = -45;
+
+    // Centro de la figura (en bloques), para que quede centrada en el recuadro
+    $centroX = 1.5;
+    $centroY = 1.5;
+    $centroZ = -1;
 
     // Lista de piezas. Cada pieza es una caja con:
     //   x, y, z            -> posición de su centro (en bloques; y = altura)
@@ -22,30 +27,38 @@
     //                         'apoyo' (cae y luego se rompe) o 'flota' (cae y se queda flotando)
     //   inicio             -> % de la animación en el que empieza
     //   fin                -> % en el que desaparece porque se ha unido a otra caja (100 = se queda hasta el final)
+    // Proporciones del logo: columna de 4 de alto, pie de 3 de largo, brazo de 2 y el cubo flotando.
     $piezas = [
-        // Bloques que caen
-        ['x' => 0, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 2, 'fin' => 42],     // columna, abajo
-        ['x' => 1, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 9, 'fin' => 21],     // pie de la L
-        ['x' => 2, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 16, 'fin' => 21],    // final del pie
-        ['x' => 2, 'y' => 0, 'z' => -1, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 23, 'fin' => 35],   // brazo de atrás
-        ['x' => 2, 'y' => 0, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 30, 'fin' => 35],   // final del brazo
-        ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 37, 'fin' => 42],    // columna, medio
-        ['x' => 0, 'y' => 2, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 44, 'fin' => 49],    // columna, arriba
-        ['x' => 2, 'y' => 1, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'apoyo', 'inicio' => 51, 'fin' => 100], // apoyo gris que se rompe
-        ['x' => 2, 'y' => 2, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'flota', 'inicio' => 58, 'fin' => 100],  // cubo pequeño
+        // Bloques que caen, en orden
+        ['x' => 0, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 2, 'fin' => 42],      // columna 1
+        ['x' => 1, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 8, 'fin' => 18],      // pie 1
+        ['x' => 2, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 14, 'fin' => 18],     // pie 2
+        ['x' => 3, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 20, 'fin' => 24],     // pie 3
+        ['x' => 3, 'y' => 0, 'z' => -1, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 26, 'fin' => 36],    // brazo 1
+        ['x' => 3, 'y' => 0, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 32, 'fin' => 36],    // brazo 2
+        ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 38, 'fin' => 42],     // columna 2
+        ['x' => 0, 'y' => 2, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 44, 'fin' => 48],     // columna 3
+        ['x' => 0, 'y' => 3, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 50, 'fin' => 54],     // columna 4
+        ['x' => 3, 'y' => 1, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'apoyo', 'inicio' => 56, 'fin' => 100], // apoyo gris que se rompe
+        ['x' => 3, 'y' => 2, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'flota', 'inicio' => 62, 'fin' => 100],  // cubo pequeño
 
-        // Cajas unidas: aparecen justo cuando cae el bloque que completa cada parte del logo
-        ['x' => 1.5, 'y' => 0, 'z' => 0, 'ancho' => 2, 'alto' => 1, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 21, 'fin' => 100],   // pie entero
-        ['x' => 2, 'y' => 0, 'z' => -1.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'aparece', 'inicio' => 35, 'fin' => 100],  // brazo entero
-        ['x' => 0, 'y' => 0.5, 'z' => 0, 'ancho' => 1, 'alto' => 2, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 42, 'fin' => 49],    // columna de 2
-        ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 3, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 49, 'fin' => 100],     // columna entera
+        // Cajas unidas: aparecen justo cuando cae el bloque que las completa
+        ['x' => 1.5, 'y' => 0, 'z' => 0, 'ancho' => 2, 'alto' => 1, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 18, 'fin' => 24],    // pie de 2
+        ['x' => 2, 'y' => 0, 'z' => 0, 'ancho' => 3, 'alto' => 1, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 24, 'fin' => 100],     // pie entero
+        ['x' => 3, 'y' => 0, 'z' => -1.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'aparece', 'inicio' => 36, 'fin' => 100],  // brazo entero
+        ['x' => 0, 'y' => 0.5, 'z' => 0, 'ancho' => 1, 'alto' => 2, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 42, 'fin' => 48],    // columna de 2
+        ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 3, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 48, 'fin' => 54],      // columna de 3
+        ['x' => 0, 'y' => 1.5, 'z' => 0, 'ancho' => 1, 'alto' => 4, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 54, 'fin' => 100],   // columna entera
     ];
 
     // Altura a la que se queda flotando el cubo pequeño cuando se rompe el apoyo
-    $alturaFlotando = 1.6;
+    $alturaFlotando = 1.7;
+
+    // Momento en el que se rompe el apoyo (justo después de que aterrice el cubo)
+    $rompe = 67;
 
     // Cada bloque tarda esto en caer (en % de la animación)
-    $caida = 5;
+    $caida = 4;
 @endphp
 
 <div class="logo-escena" role="img" aria-label="Logo de Laravel montándose con bloques">
@@ -63,9 +76,9 @@
                 if ($pieza['tipo'] == 'flota') {
                     $y = $alturaFlotando;
                 }
-                $px = ($pieza['x'] - 1) * $tam;
-                $py = (1 - $y) * $tam;
-                $pz = ($pieza['z'] + 1) * $tam;
+                $px = ($pieza['x'] - $centroX) * $tam;
+                $py = ($centroY - $y) * $tam;
+                $pz = ($pieza['z'] - $centroZ) * $tam;
 
                 // Las 6 caras de la caja: tamaño y cómo se colocan
                 $caras = [
@@ -97,8 +110,8 @@
 
 <style>
     .logo-escena {
-        width: 160px;
-        height: 160px;
+        width: 200px;
+        height: 200px;
         perspective: 800px;
         display: flex;
         align-items: center;
@@ -128,7 +141,7 @@
     .cara {
         position: absolute;
         background: #ffffff;
-        border: 2px solid #ff2d20;
+        border: 3px solid #ff2d20;
     }
 
     /* El apoyo es gris para que se vea que no forma parte del logo */
@@ -140,10 +153,10 @@
     /* La figura gira 90 grados cada dos bloques, para que se vea dónde encaja el siguiente.
        Empieza tres cuartos de vuelta antes y termina justo en el ángulo del logo. */
     @keyframes girar-figura {
-        0%, 14% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 270 }}deg); }
-        19%, 28% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 180 }}deg); }
-        33%, 42% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 90 }}deg); }
-        47%, 100% { transform: rotateX(-35deg) rotateY({{ $giroFinal }}deg); }
+        0%, 12% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 270 }}deg); }
+        16%, 24% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 180 }}deg); }
+        28%, 36% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 90 }}deg); }
+        40%, 100% { transform: rotateX(-35deg) rotateY({{ $giroFinal }}deg); }
     }
 
     /* Una animación para cada pieza, según su tipo.
@@ -154,14 +167,14 @@
             if ($pieza['tipo'] == 'flota') {
                 $y = $alturaFlotando;
             }
-            $px = ($pieza['x'] - 1) * $tam;
-            $py = (1 - $y) * $tam;
-            $pz = ($pieza['z'] + 1) * $tam;
+            $px = ($pieza['x'] - $centroX) * $tam;
+            $py = ($centroY - $y) * $tam;
+            $pz = ($pieza['z'] - $centroZ) * $tam;
 
             // Posición donde aterriza (el cubo que flota aterriza primero encima del apoyo)
             $pyAterriza = $py;
             if ($pieza['tipo'] == 'flota') {
-                $pyAterriza = (1 - $pieza['y']) * $tam;
+                $pyAterriza = ($centroY - $pieza['y']) * $tam;
             }
 
             $sitio = "translate3d({$px}px, {$py}px, {$pz}px)";
@@ -188,13 +201,13 @@
 
             @if ($pieza['tipo'] == 'apoyo')
                 {{-- El apoyo aguanta un momento con el cubo encima y se rompe --}}
-                63% { visibility: visible; transform: {{ $sitio }} scale(1); }
-                65% { visibility: visible; transform: {{ $sitio }} scale(1.2); }
-                67%, 100% { visibility: hidden; transform: {{ $sitio }} scale(0); }
+                {{ $rompe }}% { visibility: visible; transform: {{ $sitio }} scale(1); }
+                {{ $rompe + 2 }}% { visibility: visible; transform: {{ $sitio }} scale(1.2); }
+                {{ $rompe + 4 }}%, 100% { visibility: hidden; transform: {{ $sitio }} scale(0); }
             @elseif ($pieza['tipo'] == 'flota')
                 {{-- Al romperse el apoyo, el cubo baja un poco y se queda flotando --}}
-                66% { visibility: visible; transform: {{ $sitioAterriza }}; animation-timing-function: ease-out; }
-                72%, 88% { visibility: visible; transform: {{ $sitio }}; animation-timing-function: cubic-bezier(0.5, 0, 1, 0.6); }
+                {{ $rompe + 3 }}% { visibility: visible; transform: {{ $sitioAterriza }}; animation-timing-function: ease-out; }
+                {{ $rompe + 9 }}%, 88% { visibility: visible; transform: {{ $sitio }}; animation-timing-function: cubic-bezier(0.5, 0, 1, 0.6); }
                 95% { visibility: visible; transform: {{ $abajo }}; }
                 96%, 100% { visibility: hidden; transform: {{ $abajo }}; }
             @elseif ($pieza['fin'] < 100)
