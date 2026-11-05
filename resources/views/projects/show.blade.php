@@ -8,7 +8,7 @@
         <a href="{{ route('projects.index') }}" class="text-sm text-stone-600 hover:text-stone-900 hover:underline">← Volver a proyectos</a>
         <div class="mt-2 flex flex-wrap items-center gap-3">
             <h1 class="text-2xl font-semibold text-stone-900">{{ $project->title }}</h1>
-            <x-estado :estado="$project->status" />
+            @include('projects._estado', ['estado' => $project->status])
         </div>
     </x-slot>
 
@@ -27,8 +27,8 @@
                 </div>
                 <div>
                     <dt class="text-sm text-stone-500">Horas del equipo</dt>
-                    {{-- sum() suma una columna de la colección; 'pivot.contribution_hours' entra en la tabla pivote --}}
-                    <dd class="font-medium text-stone-900">{{ $project->participants->sum('pivot.contribution_hours') }} h</dd>
+                    {{-- $totalHoras lo calcula el controlador sumando las horas de cada participante --}}
+                    <dd class="font-medium text-stone-900">{{ $totalHoras }} h</dd>
                 </div>
             </dl>
 
@@ -112,7 +112,7 @@
             <section>
                 <h2 class="text-lg font-semibold text-stone-900">Añadir participante</h2>
 
-                @if ($usuariosDisponibles->isEmpty())
+                @if (count($usuariosDisponibles) == 0)
                     <p class="mt-2 text-stone-600">Todos los usuarios registrados ya están en el equipo.</p>
                 @else
                     <form method="POST" action="{{ route('participants.store', $project) }}" class="mt-3 rounded-lg border border-stone-200 bg-white p-6">

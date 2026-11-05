@@ -1,7 +1,5 @@
-{{-- Componente reutilizable: <x-estado :estado="$project->status" />
+{{-- Subvista para pintar el estado: @include('projects._estado', ['estado' => ...])
      Cada estado tiene su color, pero el texto siempre se ve, así no depende solo del color --}}
-@props(['estado'])
-
 @php
     $colores = 'bg-stone-100 text-stone-700 ring-stone-300';
     if ($estado == 'en curso') {

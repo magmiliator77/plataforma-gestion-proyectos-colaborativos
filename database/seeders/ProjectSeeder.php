@@ -10,9 +10,25 @@ class ProjectSeeder extends Seeder
 {
     public function run(): void
     {
-        $ana = User::factory()->create(['name' => 'Ana', 'email' => 'ana@example.com']);
-        $luis = User::factory()->create(['name' => 'Luis', 'email' => 'luis@example.com']);
-        $eva = User::factory()->create(['name' => 'Eva', 'email' => 'eva@example.com']);
+        // Creo los usuarios de prueba a mano.
+        // La contraseña se guarda cifrada sola, porque el modelo User tiene 'password' => 'hashed'
+        $ana = User::create([
+            'name' => 'Ana',
+            'email' => 'ana@example.com',
+            'password' => 'password',
+        ]);
+
+        $luis = User::create([
+            'name' => 'Luis',
+            'email' => 'luis@example.com',
+            'password' => 'password',
+        ]);
+
+        $eva = User::create([
+            'name' => 'Eva',
+            'email' => 'eva@example.com',
+            'password' => 'password',
+        ]);
 
         $web = Project::create([
             'title' => 'Tienda online',

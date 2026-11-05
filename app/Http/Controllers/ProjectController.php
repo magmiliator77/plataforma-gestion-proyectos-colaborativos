@@ -12,9 +12,7 @@ class ProjectController extends Controller
     // Lista todos los proyectos
     public function index()
     {
-        // with() trae el propietario y los participantes en pocas consultas,
-        // en vez de hacer una consulta por cada proyecto de la lista
-        $projects = Project::with('owner', 'participants')->orderBy('deadline')->get();
+        $projects = Project::all();
 
         return view('projects.index', ['projects' => $projects]);
     }
@@ -45,17 +43,30 @@ class ProjectController extends Controller
     // Muestra el detalle de un proyecto
     public function show(Project $project)
     {
-        // Ids de los usuarios que ya están en el proyecto
-        $idsParticipantes = $project->participants->pluck('id');
+        // Sumo las horas de todos los participantes recorriéndolos uno a uno
+        $totalHoras = 0;
+        foreach ($project->participants as $participante) {
+            $totalHoras = $totalHoras + $participante->pivot->contribution_hours;
+        }
 
         // Usuarios que se pueden añadir: ni el propietario ni los que ya participan
-        $usuariosDisponibles = User::where('id', '!=', $project->user_id)
-            ->whereNotIn('id', $idsParticipantes)
-            ->orderBy('name')
-            ->get();
+        $usuariosDisponibles = [];
+        foreach (User::all() as $usuario) {
+            $yaParticipa = false;
+            foreach ($project->participants as $participante) {
+                if ($participante->id == $usuario->id) {
+                    $yaParticipa = true;
+                }
+            }
+
+            if ($usuario->id != $project->user_id && $yaParticipa == false) {
+                $usuariosDisponibles[] = $usuario;
+            }
+        }
 
         return view('projects.show', [
             'project' => $project,
+            'totalHoras' => $totalHoras,
             'usuariosDisponibles' => $usuariosDisponibles,
         ]);
     }

@@ -23,10 +23,11 @@ class ParticipantController extends Controller
             'contribution_hours' => 'required|integer|min:0',
         ]);
 
-        // Antes de añadirlo miro si ya está en el proyecto, para no repetirlo
-        $yaEsta = $project->participants()->where('user_id', $datos['user_id'])->exists();
-        if ($yaEsta) {
-            return back()->withErrors(['user_id' => 'Ese usuario ya participa en el proyecto.']);
+        // Antes de añadirlo miro uno a uno si ya está en el proyecto, para no repetirlo
+        foreach ($project->participants as $participante) {
+            if ($participante->id == $datos['user_id']) {
+                return back()->withErrors(['user_id' => 'Ese usuario ya participa en el proyecto.']);
+            }
         }
 
         // attach() inserta una fila en la tabla pivote project_user.
@@ -49,8 +50,10 @@ class ParticipantController extends Controller
             'contribution_hours' => 'required|integer|min:0',
         ]);
 
-        // updateExistingPivot() modifica la fila de la tabla pivote que ya existe
-        $project->participants()->updateExistingPivot($user->id, [
+        // Para cambiar los datos de la tabla pivote quito la fila antigua con detach()
+        // y la vuelvo a poner con attach() y los datos nuevos
+        $project->participants()->detach($user->id);
+        $project->participants()->attach($user->id, [
             'role' => $datos['role'],
             'contribution_hours' => $datos['contribution_hours'],
         ]);

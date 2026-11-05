@@ -9,7 +9,7 @@
     </x-slot>
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        @if ($projects->isEmpty())
+        @if (count($projects) == 0)
             {{-- Estado vacío: explica qué hacer en vez de dejar la página en blanco --}}
             <div class="rounded-lg border border-dashed border-stone-300 bg-white px-6 py-12 text-center">
                 <p class="text-lg font-medium text-stone-900">Todavía no hay proyectos</p>
@@ -35,7 +35,7 @@
                                         {{ $project->title }}
                                     </a>
                                 </td>
-                                <td class="px-4 py-3"><x-estado :estado="$project->status" /></td>
+                                <td class="px-4 py-3">@include('projects._estado', ['estado' => $project->status])</td>
                                 {{-- strtotime() convierte el texto de la fecha en un número y date() le da formato español --}}
                                 <td class="px-4 py-3 text-stone-700">{{ date('d/m/Y', strtotime($project->deadline)) }}</td>
                                 <td class="px-4 py-3 text-stone-700">
@@ -44,7 +44,7 @@
                                         <span class="text-stone-500">(tú)</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-right text-stone-700">{{ $project->participants->count() }}</td>
+                                <td class="px-4 py-3 text-right text-stone-700">{{ count($project->participants) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
