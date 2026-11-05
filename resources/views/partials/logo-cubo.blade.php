@@ -1,23 +1,23 @@
 {{-- Logo animado: el logo de Laravel montado con bloques, como en el Tetris.
-     - Los bloques caen uno a uno y la figura gira para que el siguiente encaje.
-     - Cuando dos bloques de la misma pieza del logo se juntan, se unen en una sola caja
-       (desaparece la línea que los separaba).
-     - Al final cae un bloque gris de apoyo, el cubo pequeño cae encima, el apoyo se rompe
-       y el cubo se queda flotando, como en el logo de Laravel.
+     1. Caen 3 bloques, uno encima de otro, y se unen formando la columna.
+     2. Caen 2 bloques tumbados: el pie y el brazo de la L.
+     3. Cae un bloque gris de apoyo.
+     4. Cae el cubo rojo encima del gris, lo rompe y se queda flotando, como en el logo.
+     La figura va girando para que se vea dónde encaja cada bloque.
      Todo es HTML y CSS: las piezas las creo con @foreach y las animaciones con @keyframes. --}}
 @php
     // Tamaño de un bloque en píxeles
-    $tam = 25;
+    $tam = 28;
 
     // Duración de toda la animación en segundos
-    $duracion = 13;
+    $duracion = 11;
 
     // Ángulo final en el que la figura se ve como el logo de Laravel
     $giroFinal = -45;
 
     // Centro de la figura (en bloques), para que quede centrada en el recuadro
-    $centroX = 1.5;
-    $centroY = 1.5;
+    $centroX = 1;
+    $centroY = 1;
     $centroZ = -1;
 
     // Lista de piezas. Cada pieza es una caja con:
@@ -27,38 +27,35 @@
     //                         'apoyo' (cae y luego se rompe) o 'flota' (cae y se queda flotando)
     //   inicio             -> % de la animación en el que empieza
     //   fin                -> % en el que desaparece porque se ha unido a otra caja (100 = se queda hasta el final)
-    // Proporciones del logo: columna de 4 de alto, pie de 3 de largo, brazo de 2 y el cubo flotando.
     $piezas = [
-        // Bloques que caen, en orden
-        ['x' => 0, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 2, 'fin' => 42],      // columna 1
-        ['x' => 1, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 8, 'fin' => 18],      // pie 1
-        ['x' => 2, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 14, 'fin' => 18],     // pie 2
-        ['x' => 3, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 20, 'fin' => 24],     // pie 3
-        ['x' => 3, 'y' => 0, 'z' => -1, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 26, 'fin' => 36],    // brazo 1
-        ['x' => 3, 'y' => 0, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 32, 'fin' => 36],    // brazo 2
-        ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 38, 'fin' => 42],     // columna 2
-        ['x' => 0, 'y' => 2, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 44, 'fin' => 48],     // columna 3
-        ['x' => 0, 'y' => 3, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 50, 'fin' => 54],     // columna 4
-        ['x' => 3, 'y' => 1, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'apoyo', 'inicio' => 56, 'fin' => 100], // apoyo gris que se rompe
-        ['x' => 3, 'y' => 2, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'flota', 'inicio' => 62, 'fin' => 100],  // cubo pequeño
+        // 1. Tres bloques, uno encima de otro
+        ['x' => 0, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 2, 'fin' => 15],
+        ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 10, 'fin' => 15],
+        ['x' => 0, 'y' => 2, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 18, 'fin' => 23],
 
-        // Cajas unidas: aparecen justo cuando cae el bloque que las completa
-        ['x' => 1.5, 'y' => 0, 'z' => 0, 'ancho' => 2, 'alto' => 1, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 18, 'fin' => 24],    // pie de 2
-        ['x' => 2, 'y' => 0, 'z' => 0, 'ancho' => 3, 'alto' => 1, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 24, 'fin' => 100],     // pie entero
-        ['x' => 3, 'y' => 0, 'z' => -1.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'aparece', 'inicio' => 36, 'fin' => 100],  // brazo entero
-        ['x' => 0, 'y' => 0.5, 'z' => 0, 'ancho' => 1, 'alto' => 2, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 42, 'fin' => 48],    // columna de 2
-        ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 3, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 48, 'fin' => 54],      // columna de 3
-        ['x' => 0, 'y' => 1.5, 'z' => 0, 'ancho' => 1, 'alto' => 4, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 54, 'fin' => 100],   // columna entera
+        // Columna unida: primero de 2 bloques y luego de 3
+        ['x' => 0, 'y' => 0.5, 'z' => 0, 'ancho' => 1, 'alto' => 2, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 15, 'fin' => 23],
+        ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 3, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 23, 'fin' => 100],
+
+        // 2. Dos bloques tumbados: el pie (hacia la derecha) y el brazo (hacia atrás)
+        ['x' => 1.5, 'y' => 0, 'z' => 0, 'ancho' => 2, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 26, 'fin' => 100],
+        ['x' => 2, 'y' => 0, 'z' => -1.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'cae', 'inicio' => 34, 'fin' => 100],
+
+        // 3. Bloque gris de apoyo
+        ['x' => 2, 'y' => 1, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'apoyo', 'inicio' => 42, 'fin' => 100],
+
+        // 4. Cubo rojo: cae sobre el gris, lo rompe y se queda flotando
+        ['x' => 2, 'y' => 2, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'flota', 'inicio' => 50, 'fin' => 100],
     ];
 
-    // Altura a la que se queda flotando el cubo pequeño cuando se rompe el apoyo
-    $alturaFlotando = 1.7;
+    // Altura a la que se queda flotando el cubo rojo cuando se rompe el apoyo
+    $alturaFlotando = 1.45;
 
-    // Momento en el que se rompe el apoyo (justo después de que aterrice el cubo)
-    $rompe = 67;
+    // Momento en el que se rompe el apoyo (justo después de que aterrice el cubo rojo)
+    $rompe = 56;
 
     // Cada bloque tarda esto en caer (en % de la animación)
-    $caida = 4;
+    $caida = 5;
 @endphp
 
 <div class="logo-escena" role="img" aria-label="Logo de Laravel montándose con bloques">
@@ -153,10 +150,10 @@
     /* La figura gira 90 grados cada dos bloques, para que se vea dónde encaja el siguiente.
        Empieza tres cuartos de vuelta antes y termina justo en el ángulo del logo. */
     @keyframes girar-figura {
-        0%, 12% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 270 }}deg); }
-        16%, 24% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 180 }}deg); }
-        28%, 36% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 90 }}deg); }
-        40%, 100% { transform: rotateX(-35deg) rotateY({{ $giroFinal }}deg); }
+        0%, 16% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 270 }}deg); }
+        20%, 32% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 180 }}deg); }
+        35%, 40% { transform: rotateX(-35deg) rotateY({{ $giroFinal - 90 }}deg); }
+        44%, 100% { transform: rotateX(-35deg) rotateY({{ $giroFinal }}deg); }
     }
 
     /* Una animación para cada pieza, según su tipo.
