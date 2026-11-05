@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Letra de los títulos (Bricolage Grotesque), igual en la portada y en toda la aplicación */
+.titulo {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+}
+
+/* El logo animado del login, pero más grande en la portada */
+.logo-grande {
+    transform: scale(1.15);
+}

@@ -1,13 +1,17 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <h1 class="titulo text-4xl font-extrabold text-stone-900">Proyectos</h1>
-            <a href="{{ route('projects.create') }}" class="inline-flex items-center rounded-md bg-[#e0261b] px-4 py-2 text-sm font-semibold text-white hover:bg-[#c11f15] focus:outline-none focus:ring-2 focus:ring-[#e0261b] focus:ring-offset-2">
-                Nuevo proyecto
-            </a>
-        </div>
-    </x-slot>
+@extends('layouts.app')
 
+@section('title', 'Proyectos')
+
+@section('header')
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <h1 class="titulo text-4xl font-extrabold text-stone-900">Proyectos</h1>
+        <a href="{{ route('projects.create') }}" class="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">
+            Nuevo proyecto
+        </a>
+    </div>
+@endsection
+
+@section('content')
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @if (count($projects) == 0)
             {{-- Estado vacío: explica qué hacer en vez de dejar la página en blanco --}}
@@ -31,16 +35,21 @@
                         @foreach ($projects as $project)
                             <tr class="hover:bg-stone-50">
                                 <td class="px-4 py-3">
-                                    <a href="{{ route('projects.show', $project) }}" class="font-medium text-stone-900 hover:text-[#e0261b] hover:underline">
+                                    <a href="{{ route('projects.show', $project->id) }}" class="font-medium text-stone-900 hover:text-red-600 hover:underline">
                                         {{ $project->title }}
                                     </a>
                                 </td>
-                                <td class="px-4 py-3">@include('projects._estado', ['estado' => $project->status])</td>
-                                {{-- strtotime() convierte el texto de la fecha en un número y date() le da formato español --}}
-                                <td class="px-4 py-3 text-stone-700">{{ date('d/m/Y', strtotime($project->deadline)) }}</td>
+                                <td class="px-4 py-3">
+                                    {{-- La subvista _estado usa la variable $estado --}}
+                                    @php
+                                        $estado = $project->status;
+                                    @endphp
+                                    @include('projects._estado')
+                                </td>
+                                <td class="px-4 py-3 text-stone-700">{{ $project->deadline }}</td>
                                 <td class="px-4 py-3 text-stone-700">
                                     {{ $project->owner->name }}
-                                    @if ($project->user_id == auth()->id())
+                                    @if ($project->user_id == Auth::user()->id)
                                         <span class="text-stone-500">(tú)</span>
                                     @endif
                                 </td>
@@ -52,4 +61,4 @@
             </div>
         @endif
     </div>
-</x-app-layout>
+@endsection

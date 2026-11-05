@@ -7,8 +7,8 @@
                 <div class="shrink-0 flex items-center">
                     {{-- Logo de Laravel en rojo y el nombre de la aplicación, como en la portada --}}
                     <a href="{{ route('projects.index') }}" class="flex items-center gap-2">
-                        <x-application-logo class="block h-8 w-auto fill-current text-[#e0261b]" />
-                        <span class="titulo text-xl font-extrabold text-stone-900">{{ config('app.name') }}</span>
+                        <x-application-logo class="block h-8 w-auto fill-current text-red-600" />
+                        <span class="titulo text-xl font-extrabold text-stone-900">Proyectos en equipo</span>
                     </a>
                 </div>
 

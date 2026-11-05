@@ -1,17 +1,23 @@
-<x-app-layout>
-    {{-- Guardo en una variable si el usuario conectado es el propietario, para no repetirlo --}}
-    @php
-        $esPropietario = $project->user_id == auth()->id();
-    @endphp
+@extends('layouts.app')
 
-    <x-slot name="header">
-        <a href="{{ route('projects.index') }}" class="text-sm text-stone-600 hover:text-stone-900 hover:underline">← Volver a proyectos</a>
-        <div class="mt-2 flex flex-wrap items-center gap-3">
-            <h1 class="titulo text-4xl font-extrabold text-stone-900">{{ $project->title }}</h1>
-            @include('projects._estado', ['estado' => $project->status])
-        </div>
-    </x-slot>
+@section('title', $project->title)
 
+{{-- Guardo en variables si el usuario conectado es el propietario y el estado, para no repetirlo --}}
+@php
+    $esPropietario = $project->user_id == Auth::user()->id;
+    $estado = $project->status;
+@endphp
+
+@section('header')
+    <a href="{{ route('projects.index') }}" class="text-sm text-stone-600 hover:text-stone-900 hover:underline">← Volver a proyectos</a>
+    <div class="mt-2 flex flex-wrap items-center gap-3">
+        <h1 class="titulo text-4xl font-extrabold text-stone-900">{{ $project->title }}</h1>
+        {{-- La subvista _estado usa la variable $estado --}}
+        @include('projects._estado')
+    </div>
+@endsection
+
+@section('content')
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
 
         {{-- Datos del proyecto --}}
@@ -23,7 +29,7 @@
                 </div>
                 <div>
                     <dt class="text-sm text-stone-500">Fecha límite</dt>
-                    <dd class="font-medium text-stone-900">{{ date('d/m/Y', strtotime($project->deadline)) }}</dd>
+                    <dd class="font-medium text-stone-900">{{ $project->deadline }}</dd>
                 </div>
                 <div>
                     <dt class="text-sm text-stone-500">Horas del equipo</dt>
@@ -72,13 +78,13 @@
                                     </td>
                                     <td class="px-4 py-2">
                                         <div class="flex justify-end gap-2">
-                                            <form id="editar-{{ $participante->id }}" method="POST" action="{{ route('participants.update', [$project, $participante]) }}">
+                                            <form id="editar-{{ $participante->id }}" method="POST" action="{{ route('participants.update', [$project->id, $participante->id]) }}">
                                                 @csrf
                                                 @method('PUT')
                                                 <button type="submit" class="rounded-md border border-stone-300 bg-white px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-50">Guardar</button>
                                             </form>
 
-                                            <form method="POST" action="{{ route('participants.destroy', [$project, $participante]) }}" onsubmit="return confirm('¿Quitar a {{ $participante->name }} del proyecto?')">
+                                            <form method="POST" action="{{ route('participants.destroy', [$project->id, $participante->id]) }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="rounded-md px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50">Quitar</button>
@@ -103,8 +109,12 @@
                     </tbody>
                 </table>
             </div>
-            <x-input-error :messages="$errors->get('role')" class="mt-2" />
-            <x-input-error :messages="$errors->get('contribution_hours')" class="mt-2" />
+            @error('role')
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+            @error('contribution_hours')
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+            @enderror
         </section>
 
         {{-- Solo el propietario puede añadir participantes, editar y borrar el proyecto --}}
@@ -115,48 +125,49 @@
                 @if (count($usuariosDisponibles) == 0)
                     <p class="mt-2 text-stone-600">Todos los usuarios registrados ya están en el equipo.</p>
                 @else
-                    <form method="POST" action="{{ route('participants.store', $project) }}" class="mt-3 rounded-xl border border-stone-200 bg-white p-6">
+                    <form method="POST" action="{{ route('participants.store', $project->id) }}" class="mt-3 rounded-xl border border-stone-200 bg-white p-6">
                         @csrf
 
                         <div class="grid gap-6 sm:grid-cols-3">
                             <div>
-                                <x-input-label for="user_id" value="Usuario" />
+                                <label for="user_id" class="block text-sm font-medium text-stone-700">Usuario</label>
                                 <select id="user_id" name="user_id" class="mt-1 block w-full rounded-md border-stone-300 focus:border-stone-900 focus:ring-stone-900">
                                     @foreach ($usuariosDisponibles as $usuario)
                                         <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
                                     @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('user_id')" class="mt-2" />
+                                @error('user_id')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div>
-                                <x-input-label for="role" value="Rol" />
-                                <x-text-input id="role" name="role" type="text" class="mt-1 block w-full" :value="old('role')" placeholder="Ej.: Desarrollador" />
+                                <label for="role" class="block text-sm font-medium text-stone-700">Rol</label>
+                                <input id="role" name="role" type="text" value="{{ old('role') }}" placeholder="Ej.: Desarrollador" class="mt-1 block w-full rounded-md border-stone-300 focus:border-stone-900 focus:ring-stone-900">
                             </div>
 
                             <div>
-                                <x-input-label for="contribution_hours" value="Horas trabajadas" />
-                                <x-text-input id="contribution_hours" name="contribution_hours" type="number" min="0" class="mt-1 block w-full" :value="old('contribution_hours', 0)" />
+                                <label for="contribution_hours" class="block text-sm font-medium text-stone-700">Horas trabajadas</label>
+                                <input id="contribution_hours" name="contribution_hours" type="number" min="0" value="{{ old('contribution_hours', 0) }}" class="mt-1 block w-full rounded-md border-stone-300 focus:border-stone-900 focus:ring-stone-900">
                             </div>
                         </div>
 
                         <div class="mt-6">
-                            <x-primary-button>Añadir al equipo</x-primary-button>
+                            <button type="submit" class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Añadir al equipo</button>
                         </div>
                     </form>
                 @endif
             </section>
 
             <section class="flex flex-wrap items-center gap-3 border-t border-stone-200 pt-6">
-                <a href="{{ route('projects.edit', $project) }}" class="inline-flex items-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50">Editar proyecto</a>
+                <a href="{{ route('projects.edit', $project->id) }}" class="inline-flex items-center rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-50">Editar proyecto</a>
 
-                {{-- confirm() pregunta antes de borrar; si se pulsa Cancelar, el formulario no se envía --}}
-                <form method="POST" action="{{ route('projects.destroy', $project) }}" onsubmit="return confirm('¿Borrar «{{ $project->title }}»? También se quitará a su equipo. No se puede deshacer.')">
+                <form method="POST" action="{{ route('projects.destroy', $project->id) }}">
                     @csrf
                     @method('DELETE')
-                    <x-danger-button>Borrar proyecto</x-danger-button>
+                    <button type="submit" class="rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50">Borrar proyecto</button>
                 </form>
             </section>
         @endif
     </div>
-</x-app-layout>
+@endsection

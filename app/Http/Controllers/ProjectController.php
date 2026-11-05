@@ -31,18 +31,22 @@ class ProjectController extends Controller
     {
         // Si algún dato no es válido, Laravel vuelve al formulario con los errores
         $datos = $request->validate($this->reglas());
+        $datos['status'] = $this->estadoValido($datos['status']);
 
         // El propietario es siempre el usuario que ha iniciado sesión
-        $datos['user_id'] = Auth::id();
+        $datos['user_id'] = Auth::user()->id;
 
         $project = Project::create($datos);
 
-        return redirect()->route('projects.show', $project)->with('mensaje', 'Proyecto creado.');
+        return redirect()->route('projects.show', $project->id)->with('mensaje', 'Proyecto creado.');
     }
 
     // Muestra el detalle de un proyecto
-    public function show(Project $project)
+    public function show(string $id)
     {
+        // findOrFail busca el proyecto por su id y da un error 404 si no existe
+        $project = Project::findOrFail($id);
+
         // Sumo las horas de todos los participantes recorriéndolos uno a uno
         $totalHoras = 0;
         foreach ($project->participants as $participante) {
@@ -72,28 +76,42 @@ class ProjectController extends Controller
     }
 
     // Muestra el formulario para editar un proyecto
-    public function edit(Project $project)
+    public function edit(string $id)
     {
-        $this->comprobarPropietario($project);
+        $project = Project::findOrFail($id);
+
+        // Solo el propietario puede editarlo; si no lo es, vuelve al proyecto con un aviso
+        if ($this->esPropietario($project) == false) {
+            return redirect()->route('projects.show', $project->id)->with('mensaje', 'Solo el propietario puede editar el proyecto.');
+        }
 
         return view('projects.edit', ['project' => $project]);
     }
 
     // Guarda los cambios de un proyecto
-    public function update(Request $request, Project $project)
+    public function update(Request $request, string $id)
     {
-        $this->comprobarPropietario($project);
+        $project = Project::findOrFail($id);
+
+        if ($this->esPropietario($project) == false) {
+            return redirect()->route('projects.show', $project->id)->with('mensaje', 'Solo el propietario puede editar el proyecto.');
+        }
 
         $datos = $request->validate($this->reglas());
+        $datos['status'] = $this->estadoValido($datos['status']);
         $project->update($datos);
 
-        return redirect()->route('projects.show', $project)->with('mensaje', 'Cambios guardados.');
+        return redirect()->route('projects.show', $project->id)->with('mensaje', 'Cambios guardados.');
     }
 
     // Borra un proyecto
-    public function destroy(Project $project)
+    public function destroy(string $id)
     {
-        $this->comprobarPropietario($project);
+        $project = Project::findOrFail($id);
+
+        if ($this->esPropietario($project) == false) {
+            return redirect()->route('projects.show', $project->id)->with('mensaje', 'Solo el propietario puede borrar el proyecto.');
+        }
 
         $project->delete();
 
@@ -105,17 +123,29 @@ class ProjectController extends Controller
     {
         return [
             'title' => 'required|max:255',
-            'description' => 'nullable',
-            'deadline' => 'required|date',
-            'status' => 'required|in:pendiente,en curso,terminado',
+            'description' => 'max:1000',
+            'deadline' => 'required',
+            'status' => 'required',
         ];
     }
 
-    // Si el usuario no es el propietario, corta con un error 403 (prohibido)
-    private function comprobarPropietario(Project $project)
+    // El estado solo puede ser uno de estos tres; si llega otro, lo dejo en 'pendiente'
+    private function estadoValido($estado)
     {
-        if ($project->user_id != Auth::id()) {
-            abort(403);
+        if ($estado == 'pendiente' || $estado == 'en curso' || $estado == 'terminado') {
+            return $estado;
         }
+
+        return 'pendiente';
+    }
+
+    // Devuelve true si el usuario que ha iniciado sesión es el propietario del proyecto
+    private function esPropietario(Project $project)
+    {
+        if ($project->user_id == Auth::user()->id) {
+            return true;
+        }
+
+        return false;
     }
 }
