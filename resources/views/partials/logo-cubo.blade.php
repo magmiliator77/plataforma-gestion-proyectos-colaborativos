@@ -1,13 +1,14 @@
 {{-- Logo animado: el logo de Laravel montado con bloques, como en el Tetris.
      1. Caen 3 bloques, uno encima de otro, y se unen formando la columna.
-     2. Caen 2 bloques tumbados: el pie y el brazo de la L.
-     3. Cae un bloque gris de apoyo.
-     4. Cae el cubo rojo encima del gris, lo rompe y se queda flotando, como en el logo.
-     La figura va girando para que se vea dónde encaja cada bloque.
+     2. Caen 2 bloques tumbados al lado de la columna y se unen formando la barra de abajo.
+     3. Cae un bloque gris en el suelo, justo detrás del final de la barra.
+     4. Cae el cubo rojo encima del gris y lo rompe: el rojo se queda flotando
+        a la altura de la barra, sin nada debajo, como en el logo.
+     Las medidas salen del SVG oficial del logo (components/application-logo.blade.php).
      Todo es HTML y CSS: las piezas las creo con @foreach y las animaciones con @keyframes. --}}
 @php
     // Tamaño de un bloque en píxeles
-    $tam = 28;
+    $tam = 30;
 
     // Duración de toda la animación en segundos
     $duracion = 11;
@@ -16,7 +17,7 @@
     $giroFinal = -45;
 
     // Centro de la figura (en bloques), para que quede centrada en el recuadro
-    $centroX = 1;
+    $centroX = 0.5;
     $centroY = 1;
     $centroZ = -1;
 
@@ -24,11 +25,11 @@
     //   x, y, z            -> posición de su centro (en bloques; y = altura)
     //   ancho, alto, fondo -> tamaño (en bloques)
     //   tipo               -> 'cae' (cae desde arriba), 'aparece' (aparece de golpe al unirse dos bloques),
-    //                         'apoyo' (cae y luego se rompe) o 'flota' (cae y se queda flotando)
+    //                         'apoyo' (cae y luego se rompe) o 'flota' (cae y se queda encima)
     //   inicio             -> % de la animación en el que empieza
     //   fin                -> % en el que desaparece porque se ha unido a otra caja (100 = se queda hasta el final)
     $piezas = [
-        // 1. Tres bloques, uno encima de otro
+        // 1. Tres bloques, uno encima de otro: la columna
         ['x' => 0, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 2, 'fin' => 15],
         ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 10, 'fin' => 15],
         ['x' => 0, 'y' => 2, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 18, 'fin' => 23],
@@ -37,19 +38,22 @@
         ['x' => 0, 'y' => 0.5, 'z' => 0, 'ancho' => 1, 'alto' => 2, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 15, 'fin' => 23],
         ['x' => 0, 'y' => 1, 'z' => 0, 'ancho' => 1, 'alto' => 3, 'fondo' => 1, 'tipo' => 'aparece', 'inicio' => 23, 'fin' => 100],
 
-        // 2. Dos bloques tumbados: el pie (hacia la derecha) y el brazo (hacia atrás)
-        ['x' => 1.5, 'y' => 0, 'z' => 0, 'ancho' => 2, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 26, 'fin' => 100],
-        ['x' => 2, 'y' => 0, 'z' => -1.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'cae', 'inicio' => 34, 'fin' => 100],
+        // 2. Dos bloques tumbados al lado de la columna: la esquina y el final de la barra
+        ['x' => 1, 'y' => 0, 'z' => 0, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 26, 'fin' => 39],
+        ['x' => 1, 'y' => 0, 'z' => -1, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 34, 'fin' => 39],
 
-        // 3. Bloque gris de apoyo
-        ['x' => 2, 'y' => 1, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'apoyo', 'inicio' => 42, 'fin' => 100],
+        // Barra unida: los dos bloques tumbados juntos
+        ['x' => 1, 'y' => 0, 'z' => -0.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'aparece', 'inicio' => 39, 'fin' => 100],
+
+        // 3. Bloque gris de apoyo, en el suelo, a continuación de la barra
+        ['x' => 1, 'y' => 0, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'apoyo', 'inicio' => 42, 'fin' => 100],
 
         // 4. Cubo rojo: cae sobre el gris, lo rompe y se queda flotando
-        ['x' => 2, 'y' => 2, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'flota', 'inicio' => 50, 'fin' => 100],
+        ['x' => 1, 'y' => 1, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'flota', 'inicio' => 50, 'fin' => 100],
     ];
 
-    // Altura a la que se queda flotando el cubo rojo cuando se rompe el apoyo
-    $alturaFlotando = 1.45;
+    // Altura final del cubo rojo: la misma que tenía encima del gris (a ras de la barra)
+    $alturaFlotando = 1;
 
     // Momento en el que se rompe el apoyo (justo después de que aterrice el cubo rojo)
     $rompe = 56;
