@@ -43,7 +43,8 @@
         ['x' => 1, 'y' => 0, 'z' => -1, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'cae', 'inicio' => 34, 'fin' => 39],
 
         // Barra unida: los dos bloques tumbados juntos
-        ['x' => 1, 'y' => 0, 'z' => -0.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'aparece', 'inicio' => 39, 'fin' => 100],
+        // 'tapaJunta' => true tapa la raya que queda entre la barra y la columna, para que se vean unidas
+        ['x' => 1, 'y' => 0, 'z' => -0.5, 'ancho' => 1, 'alto' => 1, 'fondo' => 2, 'tipo' => 'aparece', 'inicio' => 39, 'fin' => 100, 'tapaJunta' => true],
 
         // 3. Bloque gris de apoyo, en el suelo, a continuación de la barra
         ['x' => 1, 'y' => 0, 'z' => -2, 'ancho' => 1, 'alto' => 1, 'fondo' => 1, 'tipo' => 'apoyo', 'inicio' => 42, 'fin' => 100],
@@ -104,6 +105,12 @@
                 @foreach ($caras as $numeroCara => $cara)
                     <div class="cara" style="width: {{ $cara['ancho'] }}px; height: {{ $cara['alto'] }}px; left: -{{ $cara['ancho'] / 2 }}px; top: -{{ $cara['alto'] / 2 }}px; transform: {{ $cara['giro'] }};"></div>
                 @endforeach
+
+                {{-- Parche blanco sin borde encima de la raya donde la barra toca la columna.
+                     Va dentro de la pieza, así se mueve con ella. isset() mira si la pieza tiene esa clave. --}}
+                @if (isset($pieza['tapaJunta']))
+                    <div class="tapa-junta" style="width: 7px; height: {{ $alto - 6 }}px; left: -{{ $ancho / 2 + 3 }}px; top: -{{ $alto / 2 - 3 }}px; transform: translateZ({{ $fondo / 2 + 0.5 }}px);"></div>
+                @endif
             </div>
         @endforeach
     </div>
@@ -143,6 +150,12 @@
         position: absolute;
         background: #ffffff;
         border: 3px solid #ff2d20;
+    }
+
+    /* Parche blanco que tapa la raya entre la columna y la barra */
+    .tapa-junta {
+        position: absolute;
+        background: #ffffff;
     }
 
     /* El apoyo es gris para que se vea que no forma parte del logo */
