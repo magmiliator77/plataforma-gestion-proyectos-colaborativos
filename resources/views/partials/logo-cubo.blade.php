@@ -1,5 +1,6 @@
 {{-- Logo animado: un cubo de Rubik de 2x2x2 que se monta como un Tetris.
      Las 8 piezas caen una a una y el cubo gira para que la siguiente encaje.
+     Cuando está completo, el cubo se convierte en el logo de Laravel.
      Todo es HTML y CSS: las piezas las creo con un @foreach y las animaciones con @keyframes. --}}
 @php
     // Tamaño de cada pieza en píxeles; $mitad es lo que se separa cada pieza del centro
@@ -18,7 +19,8 @@
     $duracionCaida = 6;
 @endphp
 
-<div class="cubo-escena" role="img" aria-label="Logo de Proyectos en equipo: un cubo que se va montando pieza a pieza">
+<div class="logo-animado" role="img" aria-label="Logo de Laravel que se monta pieza a pieza">
+<div class="cubo-escena">
     <div class="cubo">
         @foreach ($piezas as $numero => $pieza)
             @php
@@ -64,11 +66,24 @@
     </div>
 </div>
 
+{{-- El logo de Laravel que trae Breeze; aparece al final, cuando el cubo está montado --}}
+<div class="logo-laravel">
+    <x-application-logo class="w-24 h-24 fill-current" />
+</div>
+</div>
+
 <style>
-    .cubo-escena {
+    .logo-animado {
+        position: relative;
         width: 150px;
         height: 150px;
+    }
+
+    .cubo-escena {
+        position: absolute;
+        inset: 0;
         overflow: hidden;
+        animation: ocultar-cubo 9s infinite;
         perspective: 700px;
         display: flex;
         align-items: center;
@@ -76,6 +91,17 @@
     }
 
     /* El cubo entero: preserve-3d hace que las piezas de dentro también sean 3D */
+    .logo-laravel {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ff2d20;
+        opacity: 0;
+        animation: mostrar-laravel 9s infinite;
+    }
+
     .cubo {
         position: relative;
         width: 0;
@@ -125,14 +151,26 @@
         0%, 16% { transform: rotateX(-26deg) rotateY(35deg); }
         21%, 32% { transform: rotateX(-26deg) rotateY(125deg); }
         37%, 48% { transform: rotateX(-26deg) rotateY(215deg); }
-        53%, 66% { transform: rotateX(-26deg) rotateY(305deg); }
-        72% { transform: rotateX(-26deg) rotateY(343deg) scale(1.08); }
-        80%, 100% { transform: rotateX(-26deg) rotateY(395deg) scale(1); }
+        53%, 64% { transform: rotateX(-26deg) rotateY(305deg); }
+        69% { transform: rotateX(-26deg) rotateY(350deg) scale(1.08); }
+        74%, 100% { transform: rotateX(-26deg) rotateY(395deg) scale(1); }
+    }
+
+    /* Cuando el cubo está completo se desvanece... */
+    @keyframes ocultar-cubo {
+        0%, 74% { opacity: 1; transform: scale(1); }
+        80%, 100% { opacity: 0; transform: scale(0.7); }
+    }
+
+    /* ...y en su sitio aparece el logo de Laravel, que se queda un rato antes de repetir */
+    @keyframes mostrar-laravel {
+        0%, 75% { opacity: 0; transform: scale(1.3); }
+        82%, 95% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0; transform: scale(1); }
     }
 
     /* Una animación de caída para cada pieza: empieza escondida arriba, cae hasta su sitio
-       y se queda quieta. Al final, como en el Tetris cuando se completa, todas caen hacia abajo
-       y desaparecen para volver a empezar.
+       y se queda quieta hasta que el cubo desaparece.
        Uso visibility y no opacity porque opacity rompe el 3D de las piezas (las aplana). */
     @foreach ($inicio as $numero => $momento)
         @keyframes caer-{{ $numero }} {
@@ -144,26 +182,21 @@
             {{ $momento + 1 }}% {
                 visibility: visible;
             }
-            {{ $momento + $duracionCaida }}%, 88% {
+            {{ $momento + $duracionCaida }}%, 100% {
                 visibility: visible;
                 transform: translate3d(var(--x), var(--y), var(--z));
-                animation-timing-function: cubic-bezier(0.5, 0, 1, 0.6);
-            }
-            96% {
-                visibility: visible;
-                transform: translate3d(var(--x), calc(var(--y) + 170px), var(--z));
-            }
-            97%, 100% {
-                visibility: hidden;
-                transform: translate3d(var(--x), calc(var(--y) + 170px), var(--z));
             }
         }
     @endforeach
 
-    /* Si el usuario tiene activado "reducir movimiento" en su sistema, enseño el cubo ya montado y quieto */
+    /* Si el usuario tiene activado "reducir movimiento" en su sistema, enseño directamente el logo de Laravel */
     @media (prefers-reduced-motion: reduce) {
-        .cubo, .cubo-pieza {
+        .cubo-escena {
+            display: none;
+        }
+        .logo-laravel {
             animation: none;
+            opacity: 1;
         }
     }
 </style>
