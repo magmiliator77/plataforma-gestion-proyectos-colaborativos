@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-4">
-            <h1 class="text-2xl font-semibold text-stone-900">Proyectos</h1>
-            <a href="{{ route('projects.create') }}" class="inline-flex items-center rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2">
+            <h1 class="titulo text-4xl font-extrabold text-stone-900">Proyectos</h1>
+            <a href="{{ route('projects.create') }}" class="inline-flex items-center rounded-md bg-[#e0261b] px-4 py-2 text-sm font-semibold text-white hover:bg-[#c11f15] focus:outline-none focus:ring-2 focus:ring-[#e0261b] focus:ring-offset-2">
                 Nuevo proyecto
             </a>
         </div>
@@ -11,12 +11,12 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @if (count($projects) == 0)
             {{-- Estado vacío: explica qué hacer en vez de dejar la página en blanco --}}
-            <div class="rounded-lg border border-dashed border-stone-300 bg-white px-6 py-12 text-center">
-                <p class="text-lg font-medium text-stone-900">Todavía no hay proyectos</p>
+            <div class="rounded-xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center">
+                <p class="titulo text-2xl font-extrabold text-stone-900">Todavía no hay proyectos</p>
                 <p class="mt-1 text-stone-600">Crea el primero y añade a tu equipo desde su página.</p>
             </div>
         @else
-            <div class="overflow-x-auto rounded-lg border border-stone-200 bg-white">
+            <div class="overflow-x-auto rounded-xl border border-stone-200 bg-white">
                 <table class="min-w-full divide-y divide-stone-200 text-left text-sm">
                     <thead class="bg-stone-50 text-stone-600">
                         <tr>
@@ -31,7 +31,7 @@
                         @foreach ($projects as $project)
                             <tr class="hover:bg-stone-50">
                                 <td class="px-4 py-3">
-                                    <a href="{{ route('projects.show', $project) }}" class="font-medium text-stone-900 hover:text-teal-700 hover:underline">
+                                    <a href="{{ route('projects.show', $project) }}" class="font-medium text-stone-900 hover:text-[#e0261b] hover:underline">
                                         {{ $project->title }}
                                     </a>
                                 </td>

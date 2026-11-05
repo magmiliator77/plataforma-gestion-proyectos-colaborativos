@@ -7,7 +7,7 @@
     <x-slot name="header">
         <a href="{{ route('projects.index') }}" class="text-sm text-stone-600 hover:text-stone-900 hover:underline">← Volver a proyectos</a>
         <div class="mt-2 flex flex-wrap items-center gap-3">
-            <h1 class="text-2xl font-semibold text-stone-900">{{ $project->title }}</h1>
+            <h1 class="titulo text-4xl font-extrabold text-stone-900">{{ $project->title }}</h1>
             @include('projects._estado', ['estado' => $project->status])
         </div>
     </x-slot>
@@ -39,9 +39,9 @@
 
         {{-- Participantes --}}
         <section>
-            <h2 class="text-lg font-semibold text-stone-900">Equipo</h2>
+            <h2 class="titulo text-2xl font-extrabold text-stone-900">Equipo</h2>
 
-            <div class="mt-3 overflow-x-auto rounded-lg border border-stone-200 bg-white">
+            <div class="mt-3 overflow-x-auto rounded-xl border border-stone-200 bg-white">
                 <table class="min-w-full divide-y divide-stone-200 text-left text-sm">
                     <thead class="bg-stone-50 text-stone-600">
                         <tr>
@@ -64,11 +64,11 @@
                                          form="..." une cada input con su formulario aunque estén en celdas distintas --}}
                                     <td class="px-4 py-2">
                                         <label for="rol-{{ $participante->id }}" class="sr-only">Rol de {{ $participante->name }}</label>
-                                        <input id="rol-{{ $participante->id }}" type="text" name="role" value="{{ $participante->pivot->role }}" form="editar-{{ $participante->id }}" class="w-40 rounded-md border-stone-300 text-sm shadow-sm focus:border-teal-600 focus:ring-teal-600">
+                                        <input id="rol-{{ $participante->id }}" type="text" name="role" value="{{ $participante->pivot->role }}" form="editar-{{ $participante->id }}" class="w-40 rounded-md border-stone-300 text-sm focus:border-stone-900 focus:ring-stone-900">
                                     </td>
                                     <td class="px-4 py-2">
                                         <label for="horas-{{ $participante->id }}" class="sr-only">Horas de {{ $participante->name }}</label>
-                                        <input id="horas-{{ $participante->id }}" type="number" name="contribution_hours" min="0" value="{{ $participante->pivot->contribution_hours }}" form="editar-{{ $participante->id }}" class="w-24 rounded-md border-stone-300 text-sm shadow-sm focus:border-teal-600 focus:ring-teal-600">
+                                        <input id="horas-{{ $participante->id }}" type="number" name="contribution_hours" min="0" value="{{ $participante->pivot->contribution_hours }}" form="editar-{{ $participante->id }}" class="w-24 rounded-md border-stone-300 text-sm focus:border-stone-900 focus:ring-stone-900">
                                     </td>
                                     <td class="px-4 py-2">
                                         <div class="flex justify-end gap-2">
@@ -110,18 +110,18 @@
         {{-- Solo el propietario puede añadir participantes, editar y borrar el proyecto --}}
         @if ($esPropietario)
             <section>
-                <h2 class="text-lg font-semibold text-stone-900">Añadir participante</h2>
+                <h2 class="titulo text-2xl font-extrabold text-stone-900">Añadir participante</h2>
 
                 @if (count($usuariosDisponibles) == 0)
                     <p class="mt-2 text-stone-600">Todos los usuarios registrados ya están en el equipo.</p>
                 @else
-                    <form method="POST" action="{{ route('participants.store', $project) }}" class="mt-3 rounded-lg border border-stone-200 bg-white p-6">
+                    <form method="POST" action="{{ route('participants.store', $project) }}" class="mt-3 rounded-xl border border-stone-200 bg-white p-6">
                         @csrf
 
                         <div class="grid gap-6 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="user_id" value="Usuario" />
-                                <select id="user_id" name="user_id" class="mt-1 block w-full rounded-md border-stone-300 shadow-sm focus:border-teal-600 focus:ring-teal-600">
+                                <select id="user_id" name="user_id" class="mt-1 block w-full rounded-md border-stone-300 focus:border-stone-900 focus:ring-stone-900">
                                     @foreach ($usuariosDisponibles as $usuario)
                                         <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
                                     @endforeach
